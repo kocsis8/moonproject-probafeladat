@@ -8,8 +8,6 @@ export default function DatePicker( props) {
 
 
     const sendDataToParent = () => {
-       //"purchase_time": "2021-07-21 10:00"
-        
         props.sendDataToParent(timeFormat());
       };
 
@@ -48,7 +46,11 @@ export default function DatePicker( props) {
     let tindex = 0;
 
     for (let index = 1; index < 31; index++) {
-      dayList[tindex] = jun + " " + index + ".";
+      if(index < 10){
+        dayList[tindex] = jun + " 0" + index + ".";
+      }else{
+        dayList[tindex] = jun + " " + index + ".";
+      }
       if( dayList[tindex] === currentDay){
         return;
       }
@@ -56,7 +58,12 @@ export default function DatePicker( props) {
     }
 
     for (let index = 1; index < 32; index++) {
-      dayList[tindex] = jul + " " + index + ".";
+      if(index < 10){
+      dayList[tindex] = jul + " 0" + index + ".";
+      }else{
+        dayList[tindex] = jul + " " + index + ".";
+      }
+
       if( dayList[tindex] === currentDay){
         return;
       }
@@ -64,7 +71,11 @@ export default function DatePicker( props) {
     }
 
     for (let index = 1; index < 31; index++) {
-      dayList[tindex] = alg + " " + index + ".";
+      if(index < 10){
+        dayList[tindex] = alg + " 0" + index + ".";
+      }else{
+        dayList[tindex] = alg + " " + index + ".";
+      }
       if( dayList[tindex] === currentDay){
         return;
       }
@@ -133,24 +144,22 @@ export default function DatePicker( props) {
   const [hours, setHour] = React.useState("");
   const [minutes, setMinute] = React.useState("");
 
+  React.useEffect(() => {
+    // Az hours állapot változott, itt már használható az értéke
+    sendDataToParent();
+  }, [day, hours , minutes]);
+
 
   const handleChangeDay = (event) => {
     setDay(event.target.value);
-    timeFormat();
   };
 
   const handleChangeHour = (event) => {
     setHour(event.target.value);
-    setTimeout(() => {
-        // A kívánt függvény meghívása
-        console.log("óra: "+hours);
-      }, 0);
-    //timeFormat();
   };
 
   const handleChangeMinute = (event) => {
     setMinute(event.target.value);
-    timeFormat();
   };
 
   return (
