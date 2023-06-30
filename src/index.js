@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import CodeUpload from './components/codeUpload/CodeUpload';
+import Signup from './components/signup/Signup';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <CodeUpload />
+    <Signup />
 );
 
 // If you want to start measuring performance in your app, pass a function

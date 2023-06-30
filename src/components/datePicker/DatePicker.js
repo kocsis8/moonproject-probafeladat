@@ -128,8 +128,6 @@ export default function DatePicker( props) {
 
         puredate += " "+ hours + ":" + minutes;
 
-        console.log(puredate);
-
         return puredate;
 
   }

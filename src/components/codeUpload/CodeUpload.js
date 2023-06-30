@@ -10,6 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import DatePicker from "../datePicker/DatePicker";
 import "./CodeUpload.css";
+import Signup from "../signup/Signup";
 
 // a form validáláshoz való yup schema
 const schema = yup.object().shape({
@@ -41,12 +42,50 @@ export default function CodeUpload() {
   };
 
   //form sikeres validálása után lefutó esemény
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (formatedDate.length !== 16) {
       setShowHelperText(true);
       return;
     }
+   
+    const dataToSend = {
+      email: data.Email,
+      code: data.Code,
+      purchase_time: formatedDate,
+    };
+
+   
+    try {
+      const response = 
+      await fetch('https://ncp-dummy.staging.moonproject.io/api/kocsis-marton-pal/code/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Sikeres adatküldés:', responseData);
+        // Itt kezelheted a sikeres választ és a responseData-t
+      } else {
+        const errorData = await response.json();
+        const errorCodes = errorData.errors.map(error => error.code);
+      
+        if(errorCodes[0] === "email:not_found"){ 
+          console.log("kod: "+errorCodes);
+          <Signup data = {dataToSend}  />
+        }
+        console.log('Hiba az adatküldés során:', errorData);
+        // Itt kezelheted a hibás választ
+      }
+    } catch (error) {
+      console.error('Hiba történt az API-kérés során:', error);
+    }
   };
+
+  
 
   return (
     <Stack
