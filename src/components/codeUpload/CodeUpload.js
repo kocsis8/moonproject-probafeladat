@@ -11,6 +11,7 @@ import * as yup from "yup";
 import DatePicker from "../datePicker/DatePicker";
 import "./CodeUpload.css";
 import Signup from "../signup/Signup";
+import Resoult from "../resoult/Resoult";
 
 // a form validáláshoz való yup schema
 const schema = yup.object().shape({
@@ -26,7 +27,11 @@ const schema = yup.object().shape({
 
 export default function CodeUpload() {
   const [showHelperText, setShowHelperText] = React.useState(false);
-  let formatedDate = "";
+  const [showSignup, setShowSignup] = React.useState(false);
+  const [showResoult, setShowResult] = React.useState(false);
+  const [signupData, setSignupData] = React.useState(null);
+  const [formatedDate,setFormatedDate] = React.useState("");
+ 
 
   // hook-form változói
   const {
@@ -38,11 +43,12 @@ export default function CodeUpload() {
   });
 
   const handleDataFromChild = (data) => {
-    formatedDate = data;
+    setFormatedDate (data);
   };
 
   //form sikeres validálása után lefutó esemény
   const onSubmit = async (data) => {
+    console.log(formatedDate.length);
     if (formatedDate.length !== 16) {
       setShowHelperText(true);
       return;
@@ -50,7 +56,7 @@ export default function CodeUpload() {
    
     const dataToSend = {
       email: data.Email,
-      code: data.Code,
+      code:  data.Code,
       purchase_time: formatedDate,
     };
 
@@ -67,15 +73,18 @@ export default function CodeUpload() {
 
       if (response.ok) {
         const responseData = await response.json();
+        setShowResult(true);
+       {showResoult && <Resoult data={responseData} />}
         console.log('Sikeres adatküldés:', responseData);
         // Itt kezelheted a sikeres választ és a responseData-t
-      } else {
+      } else if (response.status === 422) {
         const errorData = await response.json();
         const errorCodes = errorData.errors.map(error => error.code);
       
-        if(errorCodes[0] === "email:not_found"){ 
-          console.log("kod: "+errorCodes);
-          <Signup data = {dataToSend}  />
+        if (errorCodes[0] === "email:not_found") { 
+          console.log("kod: " + errorCodes);
+          setSignupData(dataToSend);
+          setShowSignup(true);
         }
         console.log('Hiba az adatküldés során:', errorData);
         // Itt kezelheted a hibás választ
@@ -124,6 +133,7 @@ export default function CodeUpload() {
               <p className="MuiFormHelperText-root">Dátum megadása kötelező.</p>
             )}
             <CardActions>
+            {showSignup && <Signup data={signupData} />}
               <Button
                 variant="contained"
                 color="primary"

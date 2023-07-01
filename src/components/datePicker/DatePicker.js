@@ -20,11 +20,15 @@ export default function DatePicker( props) {
     
     const currentDate = new Date();
     const month = currentDate.getMonth() + 1;
-    const day = currentDate.getDate();
+    let day = currentDate.getDate();
 
     const jun = "Június";
     const jul = "Júlisu";
     const alg = "Algusztus";
+
+    if(day < 10){
+      day ="0"+day; 
+    }
 
     if(month === 6){
         currentDay = jun+" "+day+".";
@@ -60,10 +64,12 @@ export default function DatePicker( props) {
     for (let index = 1; index < 32; index++) {
       if(index < 10){
       dayList[tindex] = jul + " 0" + index + ".";
+      currentDay.replace(" "," 0");
       }else{
         dayList[tindex] = jul + " " + index + ".";
+        currentDay.replace(" 0"," ");
       }
-
+     
       if( dayList[tindex] === currentDay){
         return;
       }
