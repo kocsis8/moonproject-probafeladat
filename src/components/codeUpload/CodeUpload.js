@@ -31,6 +31,7 @@ export default function CodeUpload() {
   const [showResoult, setShowResult] = React.useState(false);
   const [signupData, setSignupData] = React.useState(null);
   const [formatedDate,setFormatedDate] = React.useState("");
+  const [dataToResoult,setDataToResoult] = React.useState("");
  
 
   // hook-form változói
@@ -48,7 +49,8 @@ export default function CodeUpload() {
 
   //form sikeres validálása után lefutó esemény
   const onSubmit = async (data) => {
-    console.log(formatedDate.length);
+    setShowResult(false);
+   // console.log(formatedDate.length);
     if (formatedDate.length !== 16) {
       setShowHelperText(true);
       return;
@@ -74,8 +76,9 @@ export default function CodeUpload() {
       if (response.ok) {
         const responseData = await response.json();
         setShowResult(true);
-       {showResoult && <Resoult data={responseData} />}
-        console.log('Sikeres adatküldés:', responseData);
+        setDataToResoult(responseData);
+        //console.log("valsz: ", dataToResoult);
+        //console.log('Sikeres adatküldés:', responseData);
         // Itt kezelheted a sikeres választ és a responseData-t
       } else if (response.status === 422) {
         const errorData = await response.json();
@@ -134,6 +137,7 @@ export default function CodeUpload() {
             )}
             <CardActions>
             {showSignup && <Signup data={signupData} />}
+            {showResoult && <Resoult data={dataToResoult} /> }
               <Button
                 variant="contained"
                 color="primary"
