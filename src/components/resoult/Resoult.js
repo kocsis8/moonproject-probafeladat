@@ -4,16 +4,16 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 
 export default function Resoult(props) {
-  
+  // kapott propsból won érték kinyerése
   const won = props.data.data.won;
 
-
+// dialogus nyitvatartását tárolja
   const [open, setOpen] = React.useState(true);
-
+// dialogus bázárását álltjabe
   const handleClose = () => {
     setOpen(false);
   };
-
+// tovább fejleszthetőség miatt elkülönített dialogus ablak
  if(won){
      return (
       <Dialog

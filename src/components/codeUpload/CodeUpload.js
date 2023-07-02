@@ -1,39 +1,45 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+//material UI elemek
 import Card from "@mui/material/Card";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import CardActions from "@mui/material/CardActions";
 import Divider from "@mui/material/Divider";
-import { yupResolver } from "@hookform/resolvers/yup";
+//validátor
 import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+//komponensek
 import DatePicker from "../datePicker/DatePicker";
-import "./CodeUpload.css";
 import Signup from "../signup/Signup";
 import Resoult from "../resoult/Resoult";
+//css
+import "./CodeUpload.css";
 
 // a form validáláshoz való yup schema
 const schema = yup.object().shape({
   Email: yup
     .string()
-    .email("Az email nem valós")
-    .required("email mező kitöltése kötelező"),
+    .email("Az email nem valós") // email validáció
+    .required("email mező kitöltése kötelező"), //kötelezőség vizsgálata
   Code: yup
     .string()
-    .matches(/^[A-Za-z0-9]{8,9}$/i, "A kód formátuma nem megfelelő")
-    .required("A kód megadása kötelező"),
+    .matches(/^[A-Za-z0-9]{8,9}$/i, "A kód formátuma nem megfelelő") //illeszkedés regexre
+    .required("A kód megadása kötelező"), //kötelezőség vizsgálata
 });
 
 export default function CodeUpload() {
+  //helpertext megjelenése a datepicker alatt
   const [showHelperText, setShowHelperText] = React.useState(false);
+  // konponens megjelenése van benne szabályozva
   const [showSignup, setShowSignup] = React.useState(false);
   const [showResoult, setShowResult] = React.useState(false);
+  // a két konponensek átküldött adatokat tárolja
   const [signupData, setSignupData] = React.useState(null);
-  const [formatedDate,setFormatedDate] = React.useState("");
-  const [dataToResoult,setDataToResoult] = React.useState("");
- 
-
+  const [dataToResoult, setDataToResoult] = React.useState("");
+  // a datepicker től kapott dátumat tárolja
+  const [formatedDate, setFormatedDate] = React.useState("");
   // hook-form változói
   const {
     register,
@@ -43,61 +49,61 @@ export default function CodeUpload() {
     resolver: yupResolver(schema),
   });
 
+  //datepickertől viszakapott adatok elmentése
   const handleDataFromChild = (data) => {
-    setFormatedDate (data);
+    setFormatedDate(data);
   };
 
   //form sikeres validálása után lefutó esemény
   const onSubmit = async (data) => {
-    setShowResult(false);
-   // console.log(formatedDate.length);
+    setShowResult(false); // ez csak azért van hogy frissítés nélkül is eltudjunk többet küldeni
+
+    // validálása a datepickernek
     if (formatedDate.length !== 16) {
       setShowHelperText(true);
       return;
     }
-   
+
+    // json amit meg fog kapni az API
     const dataToSend = {
       email: data.Email,
-      code:  data.Code,
+      code: data.Code,
       purchase_time: formatedDate,
     };
 
-   
+    // Api fele post
     try {
-      const response = 
-      await fetch('https://ncp-dummy.staging.moonproject.io/api/kocsis-marton-pal/code/upload', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSend),
-      });
-
-      if (response.ok) {
+      const response = await fetch(
+        "https://ncp-dummy.staging.moonproject.io/api/kocsis-marton-pal/code/upload",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataToSend),
+        }
+      );
+      
+      // ha minden rendben van
+      if (response.status === 201) {
         const responseData = await response.json();
         setShowResult(true);
         setDataToResoult(responseData);
-        //console.log("valsz: ", dataToResoult);
-        //console.log('Sikeres adatküldés:', responseData);
-        // Itt kezelheted a sikeres választ és a responseData-t
+        // ha 422 jön vissza az apitol
       } else if (response.status === 422) {
         const errorData = await response.json();
-        const errorCodes = errorData.errors.map(error => error.code);
-      
-        if (errorCodes[0] === "email:not_found") { 
-          console.log("kod: " + errorCodes);
-          setSignupData(dataToSend);
-          setShowSignup(true);
+        const errorCodes = errorData.errors.map((error) => error.code);
+        // ha ennek a 422 nek a kodja nincs emailcím
+        if (errorCodes[0] === "email:not_found") {
+          setSignupData(dataToSend); // beállítja a regiszráció felé küldendő props-t
+          setShowSignup(true); // beállítja a felugró ablak megjelenésének feltételét
         }
-        console.log('Hiba az adatküldés során:', errorData);
-        // Itt kezelheted a hibás választ
+        console.log("Hiba az adatküldés során:"+ errorData);
       }
     } catch (error) {
-      console.error('Hiba történt az API-kérés során:', error);
+      console.error("Hiba történt az API-kérés során:", error);
     }
   };
-
-  
 
   return (
     <Stack
@@ -136,8 +142,8 @@ export default function CodeUpload() {
               <p className="MuiFormHelperText-root">Dátum megadása kötelező.</p>
             )}
             <CardActions>
-            {showSignup && <Signup data={signupData} />}
-            {showResoult && <Resoult data={dataToResoult} /> }
+              {showSignup && <Signup data={signupData} />}
+              {showResoult && <Resoult data={dataToResoult} />}
               <Button
                 variant="contained"
                 color="primary"
